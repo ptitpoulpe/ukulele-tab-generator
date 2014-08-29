@@ -1,0 +1,68 @@
+<html>
+<head>
+ <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"></meta>
+ <title>Ukulele Tab Generator</title>
+ <script>
+  var chords = {"G": [2,3,2,0],
+                "F": [0,1,0,2]};
+  
+  function generateChord(chord) {
+    if (!(chord in chords))
+      return "[" + chord + "]";
+    var canvas = document.createElement('canvas');
+    canvas.width  = 22;
+    canvas.height = 47;
+    //canvas.style.cssFloat = "left";
+    canvas.style.zIndex = 8;
+    //canvas.style.border = "1px solid";
+    var context = canvas.getContext('2d');
+   for (i=0; i<4; i++) {
+     context.fillRect(3+i*5, 0, 1, 44);
+   }
+   context.fillRect(3, 0, 16, 3);
+   for (i=1; i<5; i++) {
+     context.fillRect(3, 3+i*10, 16, 1);
+   }
+   var positions = chords[chord];
+   len = positions.length;
+   for (i=0; i< len; i++) {
+     if (positions[i]>0)
+      context.beginPath();
+      context.arc((4-i)*5-2, positions[i]*10-2, 2.5, 0, 2*Math.PI, false);
+      context.fill();
+   }
+   return canvas;
+  }
+
+  function generate() {
+   var ukutab = document.getElementById('ukuleletab').value.replace(/ /g,"&nbsp;").replace(/\n/g,"<br />") ;
+   var gentab = document.getElementById('computedtab');
+   var chordRe = /\[(.*?)\]/g;
+   var myArray;
+   //alert(ukutab);
+   var index = 0;
+   while ((myArray = chordRe.exec(ukutab)) !== null) {
+    var text = document.createElement('span');
+    //text.style.cssFloat = "left";
+    text.innerHTML = ukutab.substring(index, myArray.index);
+    gentab.appendChild(text);
+    index = chordRe.lastIndex;
+    gentab.appendChild(generateChord(myArray[1]));
+   }
+   var text = document.createElement('span');
+   //text.style.cssFloat = "left";
+   text.innerHTML = ukutab.substring(index);
+   gentab.appendChild(text);
+  }
+ </script>
+</head>
+<body>
+<textarea style="border:1px solid #CCCCCC;" cols="100" rows="30" id="ukuleletab">
+</textarea>
+<div onclick="generate()">
+Compute
+</div>
+<div id="computedtab">
+</div>
+</body>
+</html>
